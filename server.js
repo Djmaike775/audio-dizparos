@@ -1,29 +1,32 @@
 const WebSocket = require("ws");
-const fs = require("fs");
 const ffmpeg = require("fluent-ffmpeg");
 
-const wss = new WebSocket.Server({ port: 3000 });
+const PORT = process.env.PORT || 3000;
 
-console.log("WebSocket ativo na porta 3000");
+const wss = new WebSocket.Server({ port: PORT });
 
-wss.on("connection", (ws, req) => {
+console.log("WebSocket ativo na porta", PORT);
+
+wss.on("connection", (ws) => {
   console.log("Dizparos conectou");
 
-  // áudio que será tocado
-  const audioFile = "./audio.mp3";
+  const audioFile = "./d5ee4a14f_converted_carrefur-G-01.wav";
 
   ffmpeg(audioFile)
-    .audioCodec("pcm_s16le") // PCM obrigatório
-    .audioFrequency(8000)    // 8kHz obrigatório
-    .audioChannels(1)        // mono
+    .audioCodec("pcm_s16le")
+    .audioFrequency(8000)
+    .audioChannels(1)
     .format("s16le")
-    .on("error", err => {
+    .on("start", () => {
+      console.log("Iniciando envio de áudio");
+    })
+    .on("error", (err) => {
       console.error("Erro FFmpeg:", err);
       ws.close();
     })
     .pipe()
-    .on("data", chunk => {
-      ws.send(chunk); // envia áudio em tempo real
+    .on("data", (chunk) => {
+      ws.send(chunk);
     })
     .on("end", () => {
       console.log("Áudio finalizado");
