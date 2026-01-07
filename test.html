@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste WebSocket Audio</title>
+</head>
+<body>
+  <h2>Teste WebSocket Audio</h2>
+  <button id="play">Conectar</button>
+
+  <script>
+    const button = document.getElementById("play");
+
+    button.onclick = () => {
+      const ws = new WebSocket("ws://localhost:3000");
+      ws.binaryType = "arraybuffer";
+
+      ws.onopen = () => {
+        console.log("Conectado no WebSocket");
+      };
+
+      ws.onmessage = (event) => {
+        console.log("Recebendo áudio:", event.data.byteLength);
+        // aqui só confirmamos que está chegando
+      };
+
+      ws.onclose = () => {
+        console.log("Conexão encerrada");
+      };
+    };
+  </script>
+</body>
+</html>
